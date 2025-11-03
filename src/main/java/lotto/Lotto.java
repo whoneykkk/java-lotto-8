@@ -1,6 +1,7 @@
 package lotto;
 
 import java.util.List;
+import java.util.Collections;
 
 public class Lotto {
     private final List<Integer> numbers;
@@ -24,5 +25,21 @@ public class Lotto {
 
     public List<Integer> getNumbers() {
         return numbers;
+    }
+
+    public Rank checkRank(List<Integer> winningNumbers, int bonusNumber) {
+        int matchCount = countMatches(winningNumbers);
+        boolean bonusMatch = numbers.contains(bonusNumber);
+        return Rank.valueOf(matchCount, bonusMatch);
+    }
+
+    private int countMatches(List<Integer> winningNumbers) {
+        int count = 0;
+        for (int number : numbers) {
+            if (winningNumbers.contains(number)) {
+                count++;
+            }
+        }
+        return count;
     }
 }

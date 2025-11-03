@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Application {
     public static void main(String[] args) {
@@ -20,6 +22,23 @@ public class Application {
 
         System.out.println("보너스 번호를 입력해 주세요.");
         int bonusNumber = parseBonusNumber(Console.readLine(), winningNumbers);
+
+        Map<Rank, Integer> results = checkWinnings(lottos, winningNumbers, bonusNumber);
+    }
+
+    private static Map<Rank, Integer> checkWinnings(List<Lotto> lottos, List<Integer> winningNumbers, int bonusNumber) {
+        Map<Rank, Integer> results = new HashMap<>();
+
+        for (Rank rank : Rank.values()) {
+            results.put(rank, 0);
+        }
+
+        for (Lotto lotto : lottos) {
+            Rank rank = lotto.checkRank(winningNumbers, bonusNumber);
+            results.put(rank, results.get(rank) + 1);
+        }
+
+        return results;
     }
 
     private static List<Lotto> generateLottos(int purchaseAmount) {
