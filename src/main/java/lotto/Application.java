@@ -1,20 +1,44 @@
 package lotto;
 
 import camp.nextstep.edu.missionutils.Console;
+import camp.nextstep.edu.missionutils.Randoms;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Application {
     public static void main(String[] args) {
         System.out.println("구입금액을 입력해 주세요.");
         int purchaseAmount = parsePurchaseAmount(Console.readLine());
 
+        List<Lotto> lottos = generateLottos(purchaseAmount);
+        printLottos(lottos);
+
         System.out.println("당첨 번호를 입력해 주세요.");
         List<Integer> winningNumbers = parseWinningNumbers(Console.readLine());
 
         System.out.println("보너스 번호를 입력해 주세요.");
         int bonusNumber = parseBonusNumber(Console.readLine(), winningNumbers);
+    }
+
+    private static List<Lotto> generateLottos(int purchaseAmount) {
+        int count = purchaseAmount / 1000;
+        System.out.println(count + "개를 구매했습니다.");
+
+        List<Lotto> lottos = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            List<Integer> numbers = Randoms.pickUniqueNumbersInRange(1, 45, 6);
+            lottos.add(new Lotto(numbers));
+        }
+        return lottos;
+    }
+
+    private static void printLottos(List<Lotto> lottos) {
+        for (Lotto lotto : lottos) {
+            System.out.println(lotto.toString());
+        }
+        System.out.println();
     }
 
     private static int parsePurchaseAmount(String input) {
