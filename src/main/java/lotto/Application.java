@@ -12,19 +12,49 @@ import java.util.HashMap;
 public class Application {
     public static void main(String[] args) {
         System.out.println("구입금액을 입력해 주세요.");
-        int purchaseAmount = parsePurchaseAmount(Console.readLine());
+        int purchaseAmount = readPurchaseAmount();
 
         List<Lotto> lottos = generateLottos(purchaseAmount);
         printLottos(lottos);
 
         System.out.println("당첨 번호를 입력해 주세요.");
-        List<Integer> winningNumbers = parseWinningNumbers(Console.readLine());
+        List<Integer> winningNumbers = readWinningNumbers();
 
         System.out.println("보너스 번호를 입력해 주세요.");
-        int bonusNumber = parseBonusNumber(Console.readLine(), winningNumbers);
+        int bonusNumber = readBonusNumber(winningNumbers);
 
         Map<Rank, Integer> results = checkWinnings(lottos, winningNumbers, bonusNumber);
         printResults(results, purchaseAmount);
+    }
+
+    private static int readPurchaseAmount() {
+        while (true) {
+            try {
+                return parsePurchaseAmount(Console.readLine());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static List<Integer> readWinningNumbers() {
+        while (true) {
+            try {
+                return parseWinningNumbers(Console.readLine());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static int readBonusNumber(List<Integer> winningNumbers) {
+        while (true) {
+            try {
+                return parseBonusNumber(Console.readLine(), winningNumbers);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     private static Map<Rank, Integer> checkWinnings(List<Lotto> lottos, List<Integer> winningNumbers, int bonusNumber) {
@@ -83,11 +113,15 @@ public class Application {
     }
 
     private static int parsePurchaseAmount(String input) {
-        int amount = Integer.parseInt(input);
-        if (amount % 1000 != 0) {
-            throw new IllegalArgumentException("[ERROR] 구입 금액은 1,000원 단위로 입력해야 합니다.");
+        try {
+            int amount = Integer.parseInt(input);
+            if (amount % 1000 != 0) {
+                throw new IllegalArgumentException("[ERROR] 구입 금액은 1,000원 단위로 입력해야 합니다.");
+            }
+            return amount;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("[ERROR] 구입 금액은 숫자여야 합니다.");
         }
-        return amount;
     }
 
     private static List<Integer> parseWinningNumbers(String input) {
@@ -96,32 +130,40 @@ public class Application {
             throw new IllegalArgumentException("[ERROR] 당첨 번호는 6개여야 합니다.");
         }
 
-        List<Integer> numbers = Arrays.stream(parts)
-                .map(String::trim)
-                .map(Integer::parseInt)
-                .toList();
+        try {
+            List<Integer> numbers = Arrays.stream(parts)
+                    .map(String::trim)
+                    .map(Integer::parseInt)
+                    .toList();
 
-        for (int number : numbers) {
-            if (number < 1 || number > 45) {
-                throw new IllegalArgumentException("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
+            for (int number : numbers) {
+                if (number < 1 || number > 45) {
+                    throw new IllegalArgumentException("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
+                }
             }
-        }
 
-        if (new HashSet<>(numbers).size() != 6) {
-            throw new IllegalArgumentException("[ERROR] 당첨 번호는 중복될 수 없습니다.");
-        }
+            if (new HashSet<>(numbers).size() != 6) {
+                throw new IllegalArgumentException("[ERROR] 당첨 번호는 중복될 수 없습니다.");
+            }
 
-        return numbers;
+            return numbers;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("[ERROR] 당첨 번호는 숫자여야 합니다.");
+        }
     }
 
     private static int parseBonusNumber(String input, List<Integer> winningNumbers) {
-        int bonusNumber = Integer.parseInt(input);
-        if (bonusNumber < 1 || bonusNumber > 45) {
-            throw new IllegalArgumentException("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
+        try {
+            int bonusNumber = Integer.parseInt(input);
+            if (bonusNumber < 1 || bonusNumber > 45) {
+                throw new IllegalArgumentException("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
+            }
+            if (winningNumbers.contains(bonusNumber)) {
+                throw new IllegalArgumentException("[ERROR] 보너스 번호는 당첨 번호와 중복될 수 없습니다.");
+            }
+            return bonusNumber;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("[ERROR] 보너스 번호는 숫자여야 합니다.");
         }
-        if (winningNumbers.contains(bonusNumber)) {
-            throw new IllegalArgumentException("[ERROR] 보너스 번호는 당첨 번호와 중복될 수 없습니다.");
-        }
-        return bonusNumber;
     }
 }
